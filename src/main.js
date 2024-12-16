@@ -25,13 +25,17 @@ app.whenReady().then(() => {
 });
 
 
-let prompt = "";
+let prompt = `
+[role]: You are an ancient sage inspired by Ostanes, sharing knowledge in a friendly and approachable tone. [endText] 
+    [Command]: Provide answers in Markdown format and maintain a friendly, conversational, and approachable tone . [endText] 
+    [Goal]: Respond to user queries with clearly and flirt, provide relevant information, and ensure a delightful user experience. [endText] 
+`;
 
 ipcMain.handle('run-model', async (_, backendType, modelPath, msg) => {
   return new Promise((resolve, reject) => {
     const expandedModelPath = modelPath.replace('~', require('os').homedir());
     const AiCliPath = `./src/lib/${backendType}/cpu-cli`;
-    console.log(expandedModelPath);
+    let emitting = false;
     
     const child = spawn(AiCliPath, [
       '--model', expandedModelPath,
@@ -39,34 +43,41 @@ ipcMain.handle('run-model', async (_, backendType, modelPath, msg) => {
       '--n-predict', '1000',
     ]);
 
-    let outputBuffer = '[role]: You are an ancient sage inspired by Ostanes, sharing knowledge in a friendly and approachable tone.';
+    let outputBuffer = '';
 
     // Listen to data events from the stdout stream
     child.stdout.on('data', (chunk) => {
       const data = chunk.toString(); // Convert Buffer to string
       console.log('Chunk received:', data);
 
-      // Process the data chunk into words or smaller pieces
-      const words = data.split(/\s+/); // Split by spaces
-      words.forEach((word) => {
-        // Send each word or chunk to the frontend
-        mainWindow.webContents.send('model-output', word);
+      if (emitting) {
+        // Kill child process if "[end" is found in the line
+        if (outputBuffer.includes('[end')) {
+          console.log('End marker found. Terminating child process.');
+            child.kill(); // Terminate the child process
+            resolve(); // Resolve to indicate completion
+          } else if(outputBuffer && data.includes(" ")) {
+            // Send each word to the frontend immediately
+            mainWindow.webContents.send('model-output', outputBuffer);
+          }
+      }
 
-        // Check for the end marker
-        if (word.includes('[end')) {
-          console.log('End marker found. Terminating child process.');
-          child.kill(); // Terminate the child process
-          resolve(); // Resolve the promise
-        }
-      });
 
-      // Accumulate the output (optional)
-      outputBuffer += data;
-    });
+      if(data.includes(" ")){
+        outputBuffer = data;
+      } else{
+        outputBuffer += data;
+      }
 
-    child.stderr.on('data', (chunk) => {
-      console.error('Error chunk received:', chunk.toString());
-    });
+      if (data.includes('[Assistant]:')) {
+        emitting = true;
+        outputBuffer = '';
+      }
+    });
+
+child.stderr.on('data', (chunk) => {
+      console.error('Error chunk received:', chunk.toString());
+    });
 
     child.on('close', (code) => {
       if (code === 0) {
