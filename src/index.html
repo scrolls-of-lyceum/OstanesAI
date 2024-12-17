@@ -1,57 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Electron Llama</title>
-  <style>
-    #output { white-space: pre-wrap; }
-  </style>
-</head>
-<body>
-  <h1>Run Llama Model</h1>
-  <label>
-    Backend Type:
-    <input id="backendType" type="text" placeholder="Backend type" value="linux" />
-  </label>
-  <br />
-  <label>
-    Model Path:
-    <input id="modelPath" type="text" placeholder="Path to model" value="" />
-  </label>
-  <br />
-  <label>
-    Prompt:
-    <textarea id="prompt" placeholder="Your prompt here">hi</textarea>
-  </label>
-  <br />
-  <button id="runModel">Run Model</button>
-  <h2>Output</h2>
-  <div id="output"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Electron Llama</title>
+    <style>
+      #output {
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Run Llama Model</h1>
+    <label>
+      Backend Type:
+      <input
+        id="backendType"
+        type="text"
+        placeholder="Backend type"
+        value="linux"
+      />
+    </label>
+    <br />
+    <label>
+      Model Path:
+      <input
+        id="modelPath"
+        type="text"
+        placeholder="Path to model"
+        value="~/Desktop/aya-expanse-8b-Q4_K_M.gguf"
+      />
+    </label>
+    <br />
+    <label>
+      Prompt:
+      <textarea id="prompt" placeholder="Your prompt here">hi</textarea>
+    </label>
+    <br />
+    <button id="runModel">Run Model</button>
+    <h2>Output</h2>
+    <div id="output"></div>
 
-  <script>
-    const backendTypeInput = document.getElementById('backendType');
-    const modelPathInput = document.getElementById('modelPath');
-    const promptInput = document.getElementById('prompt');
-    const runModelButton = document.getElementById('runModel');
-    const outputDiv = document.getElementById('output');
+    <script>
+      const backendTypeInput = document.getElementById("backendType");
+      const modelPathInput = document.getElementById("modelPath");
+      const promptInput = document.getElementById("prompt");
+      const runModelButton = document.getElementById("runModel");
+      const outputDiv = document.getElementById("output");
 
-    runModelButton.addEventListener('click', () => {
-      const backendType = backendTypeInput.value;
-      const modelPath = modelPathInput.value;
-      const prompt = promptInput.value;
+      runModelButton.addEventListener("click", () => {
+        const backendType = backendTypeInput.value;
+        const modelPath = modelPathInput.value;
+        const prompt = promptInput.value;
 
-      window.api.runModel(backendType, modelPath, prompt)
-        .catch(err => {
-          console.error('Error:', err);
+        window.api.runModel(backendType, modelPath, prompt).catch((err) => {
+          console.error("Error:", err);
           outputDiv.textContent += `Error: ${err}\n`;
         });
-    });
+      });
 
-    window.api.onModelOutput(data => {
-      outputDiv.textContent += data;
-    });
-  </script>
-</body>
+      window.api.onModelOutput((data) => {
+        outputDiv.textContent += data;
+      });
+    </script>
+  </body>
 </html>
-
