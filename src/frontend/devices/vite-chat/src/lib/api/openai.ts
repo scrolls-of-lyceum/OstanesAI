@@ -10,7 +10,7 @@ import { encode } from "./gpt-encoder";
 import { ChatMessage, SYSTEM } from "../../features/chat/types";
 import { getStorage } from "../storage";
 
-export const API_KEY = await getStorage().getApiKey();
+export const API_KEY = "jhewfrjuwuerfguwe"||await getStorage().getApiKey();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const chunkArray = <T>(array: T[], size: number): T[][] => {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>

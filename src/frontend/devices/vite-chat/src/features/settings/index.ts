@@ -10,7 +10,7 @@ const initialState: SettingsState = {
   maxTokens: 5,
   shiftSend: false,
   showPreamble: false,
-  apiKey: API_KEY,
+  apiKey: "API_KEY",
   model: "gpt-4o-mini",
 };
 

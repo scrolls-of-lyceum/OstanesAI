@@ -14,7 +14,7 @@ export type ChatInputProps = {
   onSubmit?: (values: ChatInputValue) => void;
   disabled?: boolean;
   draft?: string;
-  sendAsRole: ChatCompletionResponseMessageRoleEnum;
+  sendAsRole?: ChatCompletionResponseMessageRoleEnum;
 };
 
 export function ChatInput({
@@ -96,7 +96,7 @@ export function ChatInput({
       onSubmit={handleSubmit}
       className="pointer-events-none mx-auto max-w-2xl"
     >
-      <div className="pointer-events-auto">
+      {/* <div className="pointer-events-auto">
         <select
           name="chat-role"
           id="chat-role"
@@ -110,7 +110,7 @@ export function ChatInput({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       <div className="pointer-events-auto flex w-full flex-row ">
         <textarea
           name="chat-input"
