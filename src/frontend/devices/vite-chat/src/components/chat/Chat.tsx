@@ -49,6 +49,7 @@ export function ChatView({ chat }: ChatViewProps) {
   const handleChatInput = useCallback<NonNullable<ChatInputProps["onChange"]>>(
     ({ draft, role }) => {
       if (!chat) return;
+
       dispatch(updateDraft({ id: chat.id, draft: draft }));
 
       setSendAsRole(role);
@@ -58,6 +59,13 @@ export function ChatView({ chat }: ChatViewProps) {
   const handleChatSubmit = useCallback<NonNullable<ChatInputProps["onSubmit"]>>(
     ({ draft, role }) => {
       if (!chat) return;
+
+      console.log("---------");
+      
+      console.log(chat.draft);
+
+      console.log("---------");
+      
 
       dispatch(pushHistory({ content: draft, role: role }));
       dispatch(updateDraft({ id: chat.id, draft: "" }));

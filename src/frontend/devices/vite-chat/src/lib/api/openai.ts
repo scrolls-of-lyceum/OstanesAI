@@ -118,7 +118,6 @@ export async function* streamChatCompletion(
       if (message === "[DONE]") {
         return;
       }
-      console.log(message);
       const chunk = JSON.parse(message) as ChatCompletionChunk;
       const chunkChoice = chunk.choices[0];
 

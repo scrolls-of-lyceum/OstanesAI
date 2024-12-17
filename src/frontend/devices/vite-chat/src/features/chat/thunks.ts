@@ -18,6 +18,11 @@ export const streamCompletion = createAsyncThunk<
   string,
   { state: RootState }
 >("chat/streamCompletion", async (id: string, thunkAPI) => {
+  // alert("Done")
+
+//HTTP REQUEST 
+
+//  return 
   const state = thunkAPI.getState();
   let config: ReturnType<typeof getApiConfiguration> | undefined;
   try {
@@ -43,70 +48,22 @@ export const streamCompletion = createAsyncThunk<
 
     const history = prepareHistory(Object.values(chat.history), tokenLimit);
 
-    const stream = streamChatCompletion(
-      {
-        model: state.settings.model,
-        messages: history,
-        stream: true,
-      },
-      config,
-      {
-        responseType: "stream",
-      }
-    );
-
-    for await (const chunk of stream) {
-      if (!chunk.role) {
-        continue;
-      }
-      const state = thunkAPI.getState();
-
-      if (!state.chats.chats[id].botTyping) {
-        // The completion has been aborted
-        break;
-      }
-
-      thunkAPI.dispatch(
-        chatsSlice.actions.typeCompletionMessage({
-          id,
-          message: chunk,
-        })
-      );
-    }
-  } catch (e) {
-    if (e instanceof ChatCompletionError) {
-      if (e.response.status === 401 || e.response.status === 403) {
-        thunkAPI.dispatch(
-          createToast({
-            message: "Your API key is invalid. Please check your settings",
-            type: "error",
-            duration: 3000,
-          })
-        );
-        return;
-      }
-      if (e.response.status === 404) {
-        thunkAPI.dispatch(
-          createToast({
-            message:
-              "The model you selected does not exist. Please check your settings",
-            type: "error",
-            duration: 3000,
-          })
-        );
-        return;
-      }
-    }
+    // connect to server
 
     thunkAPI.dispatch(
-      createToast({
-        message: "Something went wrong while fetching the completion",
-        type: "error",
-        duration: 3000,
+      chatsSlice.actions.typeCompletionMessage({
+        id,
+        message: {
+          role: "system",
+          content: "hi"
+        },
       })
     );
+    
+    
+  } catch (e) {
 
-    throw e;
+    
   }
 });
 
