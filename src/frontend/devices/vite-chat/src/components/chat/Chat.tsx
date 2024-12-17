@@ -14,12 +14,65 @@ import {
 import { pushHistory, streamCompletion } from "../../features/chat/thunks";
 import { Chat } from "../../features/chat/types";
 import { Button } from "../Button";
+import { CHATGPT_MODELS } from "../../lib/constants/openai";
+import { prepareHistory } from "../../lib/api/openai";
 
 export type ChatViewProps = {
   chat: Chat;
 };
 
 export function ChatView({ chat }: ChatViewProps) {
+
+
+
+
+  useEffect(() => {
+    
+
+let Id = setTimeout(() => {
+  
+  
+  try {
+  let data
+  // connect to server
+  const eventSource = new EventSource("http://172.30.214.252:3636/events");
+  
+  // Listen for messages from the server
+        eventSource.onmessage = (event) => {
+  
+  
+           data = JSON.parse(event.data);
+           
+           console.log("*****************************",data.res);
+           
+           
+           thunkAPI.dispatch(
+             
+             chatsSlice.actions.typeCompletionMessage({
+               id,
+               message:  
+               {
+                 role: "system",
+                 content:data?.res
+                },  
+              })
+            );
+          };
+          
+          
+        } catch (e) {
+          
+          console.log("Error" , e);
+          
+        }
+      }, 1000);
+    return () => {
+      clearTimeout(Id)
+    }
+  }, [])
+  
+
+
   const dispatch = useAppDispatch();
 
   const [sendAsRole, setSendAsRole] =
@@ -57,14 +110,51 @@ export function ChatView({ chat }: ChatViewProps) {
     [chat, dispatch]
   );
   const handleChatSubmit = useCallback<NonNullable<ChatInputProps["onSubmit"]>>(
-    ({ draft, role }) => {
+   async ({ draft, role }) => {
       if (!chat) return;
+  
+      const history = prepareHistory(Object.values(chat.history), 100000000000);
 
-      console.log("---------");
+      console.log(history);
       
-      console.log(chat.draft);
-
       console.log("---------");
+
+      history[history.length] = {
+        content: chat.draft,
+        role: "user"
+      }
+
+      let message = ``;
+
+      history.map(item => {
+        message += `{role:${item.role}, content:${item.content}},`;
+      });
+
+      console.log(message);
+      
+      
+      console.log(JSON.stringify(history));
+      const StringHistory = JSON.stringify(history);
+      try {
+      const response = await fetch("http://172.30.214.252:3636/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message
+        }),
+      });
+
+      if (response.ok) {
+       console.log(response)
+      } else {
+        console.error("Failed to send message:", await response.text());
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
       
 
       dispatch(pushHistory({ content: draft, role: role }));

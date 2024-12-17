@@ -44,25 +44,36 @@ export const streamCompletion = createAsyncThunk<
     throw new Error("Chat not found");
   }
   try {
-    const tokenLimit = CHATGPT_MODELS[state.settings.model].tokens ?? 4000;
-
-    const history = prepareHistory(Object.values(chat.history), tokenLimit);
-
+let data
     // connect to server
+    const eventSource = new EventSource("http://172.30.214.252:3636/events");
 
-    thunkAPI.dispatch(
-      chatsSlice.actions.typeCompletionMessage({
-        id,
-        message: {
-          role: "system",
-          content: "hi"
-        },
-      })
-    );
-    
+      // Listen for messages from the server
+      eventSource.onmessage = (event) => {
+
+
+         data = JSON.parse(event.data);
+
+        console.log("*****************************",data.res);
+        
+
+        thunkAPI.dispatch(
+          
+          chatsSlice.actions.typeCompletionMessage({
+            id,
+            message:  
+             {
+              role: "system",
+              content:data?.res
+            },  
+          })
+        );
+      };
+      
     
   } catch (e) {
 
+    console.log("Error" , e);
     
   }
 });

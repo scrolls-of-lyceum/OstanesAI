@@ -98,8 +98,15 @@ export const chatsSlice = createSlice({
         message: PartialChatCompletionChunk;
       }>
     ) => {
+
+      
+      console.log("PAYLOAD",payload);
+      
       const { id, message } = payload.payload;
-      state.chats[id].botTypingMessage = message;
+
+      console.log(id , message);
+   
+      state.chats[id].botTypingMessage = {role:"assistant" , content:Math.random().toString()};
     },
     switchChat: (state, payload: PayloadAction<{ id: string | null }>) => {
       state.activeId = payload.payload.id;
