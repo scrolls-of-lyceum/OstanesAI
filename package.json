@@ -24,7 +24,12 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "node-sass": "^9.0.0",
+    "react-icons": "^5.4.0",
+    "react-markdown": "^9.0.1",
+    "remark-breaks": "^4.0.0",
+    "sass": "^1.83.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
