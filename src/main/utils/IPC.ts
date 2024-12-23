@@ -10,7 +10,7 @@ let prompt = `
 export const runModel = (backendType: string, modelPath: string, msg: string, _callBack:(any)=>void): Promise<string> => {
     return new Promise((resolve, reject) => {
       const expandedModelPath = modelPath.replace('~', homedir());
-      const AiCliPath = `./src/libs/${backendType}/cpu-cli`;
+      const AiCliPath = `./src/main/libs/${backendType}/cpu-cli`;
 
       const child = spawn(AiCliPath, [
         '--model',
@@ -27,17 +27,19 @@ export const runModel = (backendType: string, modelPath: string, msg: string, _c
       child.stdout.on('data', (chunk: Buffer) => {
         const data = chunk.toString();
         console.log('Chunk received:', data);
-
         if (emitting) {
-          if (outputBuffer.includes('[end')) {
+          if (outputBuffer.includes('[end') || outputBuffer.includes('[User')) {
             console.log('End marker found. Terminating child process.');
             child.kill();
             resolve(outputBuffer);
+            _callBack("[endMsg]");
           } else if (data.includes(' ')) {
             // Send each word to the frontend immediately
             _callBack(outputBuffer);
             outputBuffer = ''; // Clear buffer after sending
           }
+
+          outputBuffer += data;
         }
 
         if (data.includes('[Assistant]:')) {
@@ -45,7 +47,7 @@ export const runModel = (backendType: string, modelPath: string, msg: string, _c
           outputBuffer = ''; // Reset buffer on Assistant start
         }
 
-        outputBuffer += data;
+        
       });
 
       child.stderr.on('data', (chunk: Buffer) => {
