@@ -51,7 +51,7 @@ const ChatUI: React.FC<ChatUIProps> = ({runModel, onModelOutput}) => {
               `${a.role === "user" ? "[User]" : "[Assistant]"}${a.content}. [endText] `
           )
           .join("")}
-        \n[User]: ${input}. [endText] \n\n [Assistant]:`
+        \n[User]: ${input}. [endText] \n\n`
       runModel(prompt)
         .catch(err => {
           setLoading(false);
